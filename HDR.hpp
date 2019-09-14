@@ -63,6 +63,7 @@ struct LightOff : LightChange {
  */
 int *generatePorts(int start, int portAmount, const int *excludes = nullptr, int excludeAmount = 0) {
 	int *res = new int[portAmount];
+//	memset(res, 0, portAmount);
 	for (int i = 0, current = start; i < portAmount;) {
 		Serial.print("i and current : ");
 		Serial.println(i);
@@ -80,6 +81,83 @@ int *generatePorts(int start, int portAmount, const int *excludes = nullptr, int
 		res[i++] = current++;
 	}
 	return res;
+}
+
+void _midSort(int *arr, int len, int *targ, int targ_len, int targ_place_index) {
+	bool isOdd = len % 2;
+
+//	//Calculate the new length
+//	int newLen = isOdd ? len + 1 : len;
+
+	// (7 - 1) / 2 = 6 / 2 = 3
+	// 8 / 2 - 1 = 4 - 1 = 3
+	int midleft = (isOdd ? (len - 1) / 2 : len / 2 - 1);
+
+	// (7 - 1) / 2 = 6 / 2 = 3
+	// 8 / 2 = 4
+	int midright = (isOdd ? (len - 1) / 2 : len / 2);
+
+	targ[targ_place_index] = midleft;
+
+	targ[targ_place_index + 1] = midright;
+
+	for (int gp = 0; gp < targ_len; gp++) {
+//		printf("Port %d is %d \n", gp, ports[gp]);
+		Serial.print("Port ");
+		Serial.print(gp);
+		Serial.print(" is ");
+		Serial.println(targ[gp]);
+	}
+
+	targ_place_index += 2;
+
+	if (len - 2 > 0) {
+		int newArrLen = len - (isOdd + 1);
+		int *newArr = new int[newArrLen];
+		for (int ne = 0, nae = 0; ne < len; ne++) {
+			if (ne != midleft and ne != midright) {
+				newArr[nae++] = arr[ne];
+			}
+		}
+		delete[] arr;
+		_midSort(newArr, newArrLen, targ, targ_len, targ_place_index);
+	}
+}
+
+[[deprecated]]
+int *midSort(int *arr, int len) {
+	bool isOdd = len % 2;
+
+	//Calculate the new length
+	int newLen = isOdd ? len + 1 : len;
+
+	int *res = new int[newLen];
+
+	_midSort(arr, len, res, newLen, 0);
+
+	return res;
+
+//	// (7 - 1) / 2 = 6 / 2 = 3
+//	// 8 / 2 - 1 = 4 - 1 = 3
+//	int midleft = (isOdd ? (len - 1) / 2 : len / 2 - 1);
+//
+//	// (7 - 1) / 2 = 6 / 2 = 3
+//	// 8 / 2 = 4
+//	int midright = (isOdd ? (len - 1) / 2 : len / 2);
+//
+//	//Initialise the result array pointer
+//	int *res = new int[newLen];
+//
+//	for (int i = 0; i < len; i++) {
+//		int element = arr[i];
+//		if (i == midleft) {
+//			res[0] = element;
+//			continue;
+//		} else if (i == midright) {
+//			res[1] = element;
+//			continue;
+//		}
+//	}
 }
 
 #endif //LIGHTBLINK_HDR_HPP
